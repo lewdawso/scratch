@@ -95,7 +95,7 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 }
 
 static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __unused) {
-	
+
 	//set uio_rw to write
 	uio->uio_rw = UIO_WRITE;
 
@@ -119,7 +119,7 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 	if (uio->uio_offset == 0) {
 		echomsg->len = 0;
 	}
-	
+
 	//whatever's smaller, bytes left to write or the remaining buffer size you're writing to
 	while(1) {
 		amt = MIN(uio->uio_resid, (BUFFERSIZE - echomsg->len));
@@ -133,7 +133,7 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 			break;
 		}
 	}
-	
+
 
 	//Null terminate string and record length of string now stored in buffer
 	echomsg->len = uio->uio_offset;
