@@ -105,10 +105,12 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 	size_t amt;
 	int error;
 
+	//should only be able to write from start or end of buffer 
 	if (uio->uio_offset != 0  && (uio->uio_offset != echomsg->len)) {
 		return (EINVAL);	
 	}
 
+	//if writing from start of buffer, zero the echomsg buffer length
 	if (uio->uio_offset == 0) {
 		echomsg->len = 0;
 	}
