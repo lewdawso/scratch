@@ -126,12 +126,11 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 
 	//whatever's smaller, bytes left to write or the remaining buffer size you're writing to
 	while(1) {
-		amt = MIN(uio->uio_resid, (BUFFERSIZE - echomsg->len));
+		amt = MIN(uio->uio_resid, (BUFFERSIZE + 1 - echomsg->len));
 		error =  uiomove(echomsg->msg + uio->uio_offset, amt, uio);
 		if (uio->uio_resid != 0) {
-			//flush, then reset offset
+			//some kind of flush, then zero the offset and re-commence write ..
 			uio->uio_offset = 0;
-			echomsg->len = 0;
 		}
 		else {
 			break;
