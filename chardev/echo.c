@@ -93,8 +93,8 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 			uprintf("uiomove failed!\n");
 		}
 
+	}
 	return error;
-}
 
 static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __unused) {
 	
