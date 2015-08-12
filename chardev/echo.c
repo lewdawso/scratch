@@ -88,10 +88,8 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 	int error;
 
 	amt = MIN(uio->uio_resid, uio->uio_offset >= echomsg->len + 1 ? 0 : echomsg->len + 1 - uio->uio_offset);
-	while (uio->uio_resid != 0) {
-		if ((error = uiomove(echomsg->msg, amt, uio)) != 0) {
-			uprintf("uiomove failed!\n");
-		}
+	if ((error = uiomove(echomsg->msg, amt, uio)) != 0) {
+		uprintf("uiomove failed!\n");
 	}
 
 	return error;
@@ -99,13 +97,21 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 
 static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __unused) {
 	
+	
+	//uio_offset should be whatever the length of echomsg->len is
+	uio->uio_offset = echomsg->len ;
+
 	uprintf("Now writing to device '/dev/echo'\n");
+	uprintf("Value of uio_resid is: %ld\n", uio->uio_resid);
+	uprintf("Value of uio_offset is: %ld\n", uio->uio_offset);
 
 	size_t amt;
 	int error;
 
+
 	//should only be able to write from start or end of buffer 
 	if (uio->uio_offset != 0  && (uio->uio_offset != echomsg->len)) {
+		uprintf("Can only write from start or end of buffer!");
 		return (EINVAL);	
 	}
 
