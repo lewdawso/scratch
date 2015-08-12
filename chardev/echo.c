@@ -8,7 +8,6 @@
 #include <sys/malloc.h>
 
 #define BUFFERSIZE 255
-#define DEVADDR (void *)0xFFFFFFFF
 
 /* virtual address pointer*/
 void *vadd_ptr;
@@ -97,9 +96,11 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 
 static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __unused) {
 	
-	
-	//uio_offset should be whatever the length of echomsg->len is
-	uio->uio_offset = echomsg->len ;
+	//set uio_rw to write
+	uio->uio_rw = UIO_WRITE;
+
+	//uio_offset should correspond to length of echomsg->len
+	uio->uio_offset = echomsg->len;
 
 	uprintf("Now writing to device '/dev/echo'\n");
 	uprintf("Value of uio_resid is: %ld\n", uio->uio_resid);
@@ -107,7 +108,6 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 
 	size_t amt;
 	int error;
-
 
 	//should only be able to write from start or end of buffer 
 	if (uio->uio_offset != 0  && (uio->uio_offset != echomsg->len)) {
@@ -122,7 +122,11 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 	
 	//whatever's smaller, bytes left to write or the remaining buffer size you're writing to
 	amt = MIN(uio->uio_resid, (BUFFERSIZE - echomsg->len));
-	error =  uiomove(echomsg->msg + uio->uio_offset, amt, uio);
+	while(uio->uio_resid != 0) {
+		error =  uiomove(echomsg->msg + uio->uio_offset, amt, uio);
+		//uprintf("Value of uio_resid is: %ld\n", uio->uio_resid);
+	}
+	
 
 	//Null terminate string and record length of string now stored in buffer
 	echomsg->len = uio->uio_offset;

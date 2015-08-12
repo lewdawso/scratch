@@ -1,4 +1,9 @@
 #!/bin/sh
+#delete object and remake
+
+rm echo.ko
+make
+
 kldunload -v ./echo.ko
 kldload -v ./echo.ko
 chmod 666 /dev/echo
