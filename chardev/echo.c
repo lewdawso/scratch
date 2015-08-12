@@ -19,6 +19,7 @@ static d_open_t echo_open;
 static d_close_t echo_close;
 static d_read_t echo_read;
 static d_write_t echo_write;
+static d_mmap_t echo_mmap;
 
 /* Character device entry points */
 
@@ -28,7 +29,7 @@ static struct cdevsw echo_cdevsw = {
 	.d_close = echo_close,
 	.d_read = echo_read,
 	.d_write = echo_write,
-	.d_mmap = echo_mmap.
+	.d_mmap = echo_mmap,
 	.d_name = "echo",
 };
 
@@ -81,6 +82,8 @@ static int echo_close(struct cdev *dev __unused, int fflags __unused, int devtyp
 }
 
 static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __unused) {
+	uprintf("Now reading from device '/dev/echo'\n");
+
 	size_t amt;
 	int error;
 
@@ -96,6 +99,9 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 }
 
 static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __unused) {
+	
+	uprintf("Now writing to device '/dev/echo'\n");
+
 	size_t amt;
 	int error;
 
@@ -106,11 +112,12 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 	if (uio->uio_offset == 0) {
 		echomsg->len = 0;
 	}
-
+	
+	//whatever's smaller, bytes left to write or the remaining buffer size you're writing to
 	amt = MIN(uio->uio_resid, (BUFFERSIZE - echomsg->len));
 	error =  uiomove(echomsg->msg + uio->uio_offset, amt, uio);
 
-	//Null terminate string and record length
+	//Null terminate string and record length of string now stored in buffer
 	echomsg->len = uio->uio_offset;
 	echomsg->msg[echomsg->len] = 0;
 
@@ -124,7 +131,8 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, int nprot, vm_memattr_t *memattr) {
 	//need to convert physical device address to virtual address
 	printf("test");
-	
+	return 0;
 }
+
 
 DEV_MODULE(echo, echo_loader, NULL);
