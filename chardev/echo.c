@@ -17,10 +17,6 @@
 
 #define BUFFERSIZE 255
 
-/* virtual address pointer*/
-void *vadd_ptr;
-
-
 /* Function prototypes */
 static d_open_t echo_open;
 static d_close_t echo_close;
