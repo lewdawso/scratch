@@ -121,10 +121,17 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 	}
 	
 	//whatever's smaller, bytes left to write or the remaining buffer size you're writing to
-	amt = MIN(uio->uio_resid, (BUFFERSIZE - echomsg->len));
-	while(uio->uio_resid != 0) {
+	while(1) {
+		amt = MIN(uio->uio_resid, (BUFFERSIZE - echomsg->len));
 		error =  uiomove(echomsg->msg + uio->uio_offset, amt, uio);
-		//uprintf("Value of uio_resid is: %ld\n", uio->uio_resid);
+		if (uio->uio_resid != 0) {
+			//flush, then reset offset
+			uio->uio_offset = 0;
+			echomsg->len = 0;
+		}
+		else {
+			break;
+		}
 	}
 	
 
