@@ -87,6 +87,9 @@ static int echo_close(struct cdev *dev __unused, int fflags __unused, int devtyp
 static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __unused) {
 	uprintf("Now reading from device '/dev/echo'\n");
 
+	//set uio_rw to read
+	uio->uio_rw = UIO_READ;
+
 	size_t amt;
 	int error;
 
@@ -150,8 +153,9 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 } 
 
 static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, int nprot, vm_memattr_t *memattr) {
-	//need to convert physical device address to virtual address
-	printf("test");
+	
+	//right now, just return a physical address
+	*paddr = (0xC0000000 + offset);
 	return 0;
 }
 
