@@ -1,3 +1,11 @@
+/*
+ * Simple Echo pseudo-device KLD
+ *
+ * Murray Stokely
+ * Søren (Xride) Straarup
+ * Eitan Adler
+ */
+
 #include <sys/types.h>
 #include <sys/module.h>
 #include <sys/systm.h>
