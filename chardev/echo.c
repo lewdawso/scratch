@@ -88,14 +88,12 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 	int error;
 
 	amt = MIN(uio->uio_resid, uio->uio_offset >= echomsg->len + 1 ? 0 : echomsg->len + 1 - uio->uio_offset);
-
-	if ((error = uiomove(echomsg->msg, amt, uio)) != 0) {
-		uprintf("uiomove failed!\n");
-	}
+	while (uio->uio_resid != 0) {
+		if ((error = uiomove(echomsg->msg, amt, uio)) != 0) {
+			uprintf("uiomove failed!\n");
+		}
 
 	return error;
-
-
 }
 
 static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __unused) {
