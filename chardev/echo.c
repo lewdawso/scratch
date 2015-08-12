@@ -92,6 +92,7 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 		if ((error = uiomove(echomsg->msg, amt, uio)) != 0) {
 			uprintf("uiomove failed!\n");
 		}
+	}
 
 	return error;
 }
