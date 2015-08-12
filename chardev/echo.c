@@ -94,8 +94,8 @@ static int echo_read(struct cdev *dev __unused, struct uio *uio, int ioflag __un
 		}
 	}
 
-	}
 	return error;
+}
 
 static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __unused) {
 	
