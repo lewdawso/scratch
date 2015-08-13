@@ -14,8 +14,10 @@
 #include <sys/conf.h>
 #include <sys/uio.h>
 #include <sys/malloc.h>
+#include <vm/vm.h>
 
 #define BUFFERSIZE 255
+#define vm_prot_t vm_page_t
 
 /* Function prototypes */
 static d_open_t echo_open;
@@ -36,13 +38,16 @@ static struct cdevsw echo_cdevsw = {
 	.d_name = "echo",
 };
 
-struct s_echo {
+struct echo_softc {
 	char msg[BUFFERSIZE + 1];
 	int len;
+	//pmap_t pmap;
+	size_t usize;	
+	u_long mp_phys;
 };
 
 static struct cdev *echo_dev;
-static struct s_echo *echomsg;
+static struct echo_softc *echomsg;
 
 MALLOC_DECLARE(M_ECHOBUF);
 MALLOC_DEFINE(M_ECHOBUF, "echobuffer", "buffer for echo module");
@@ -73,8 +78,9 @@ static int echo_loader(struct module *m__unused, int what, void *arg__unused) {
 	return (error);
 }
 
-static int echo_open(struct cdev *dev __unused, int oflags __unused, int devtype __unused, struct thread *td __unused) {
+static int echo_open(struct cdev *dev __unused, int oflags __unused, int devtype __unused, struct thread *td) {
 	int error = 0;
+	//echomsg->pmap =&td->td_proc->p_vmspace->vm_pmap; 
 	uprintf("Opened device \"echo\" successfully.\n");
 	return error;
 }
@@ -152,11 +158,11 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 	return error;
 } 
 
-static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, int nprot, vm_memattr_t *memattr) {
-	
-	//right now, just return a physical address
-	*paddr = (0xC0000000 + offset);
-	return 0;
+static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, int prot, vm_memattr_t *memattr __unused) {
+
+	uprintf("mmap'ing device");
+	*paddr = echomsg->mp_phys + offset;
+	return(0);
 }
 
 
