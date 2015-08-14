@@ -15,6 +15,7 @@
 #include <sys/uio.h>
 #include <sys/malloc.h>
 #include <vm/vm.h>
+#include <vm/pmap.h>
 
 #define BUFFERSIZE 255
 #define vm_prot_t vm_page_t
@@ -35,15 +36,13 @@ static struct cdevsw echo_cdevsw = {
 	.d_read = echo_read,
 	.d_write = echo_write,
 	.d_mmap = echo_mmap,
-	.d_name = "echo",
+	.d_name = "echo"
 };
 
 struct echo_softc {
 	char msg[BUFFERSIZE + 1];
 	int len;
-	//pmap_t pmap;
-	size_t usize;	
-	u_long mp_phys;
+	pmap_t pmap;	
 };
 
 static struct cdev *echo_dev;
@@ -81,6 +80,7 @@ static int echo_loader(struct module *m__unused, int what, void *arg__unused) {
 static int echo_open(struct cdev *dev __unused, int oflags __unused, int devtype __unused, struct thread *td) {
 	int error = 0;
 	//echomsg->pmap =&td->td_proc->p_vmspace->vm_pmap; 
+	//uprintf("KVA is %p", echomsg);
 	uprintf("Opened device \"echo\" successfully.\n");
 	return error;
 }
@@ -160,10 +160,23 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 
 static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, int prot, vm_memattr_t *memattr __unused) {
 
-	uprintf("mmap'ing device");
-	*paddr = echomsg->mp_phys + offset;
+	/*uprintf("mmap'ing device\n");
+
+	if (offset > round_page(sizeof(*echomsg))) {
+		return (-1);
+	}
+	*paddr = pmap_extract(echomsg->pmap, (vm_offset_t)(echomsg + offset));
+	if (*paddr == 0) {
+		return (-1);
+	}*/
+	//get physical address from kernal virtual address
+	*paddr = vtophys((vm_offset_t)echomsg + offset);
 	return(0);
 }
 
+static int echo_ioctl(struct cdev *cdev, u_long cmd, caddr_t data, int32_t flag __unused, struct thread *rd __unused) {
+	uprintf("echo_ioctl");
+	return (0);
+	}
 
 DEV_MODULE(echo, echo_loader, NULL);
