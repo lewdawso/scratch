@@ -160,9 +160,9 @@ static int echo_write(struct cdev *cdev __unused, struct uio *uio, int ioflag __
 
 static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, int prot, vm_memattr_t *memattr __unused) {
 
-	/*uprintf("mmap'ing device\n");
+	uprintf("mmap'ing device\n");
 
-	if (offset > round_page(sizeof(*echomsg))) {
+	/*if (offset > round_page(sizeof(*echomsg))) {
 		return (-1);
 	}
 	*paddr = pmap_extract(echomsg->pmap, (vm_offset_t)(echomsg + offset));
@@ -170,7 +170,7 @@ static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, 
 		return (-1);
 	}*/
 	//get physical address from kernal virtual address
-	*paddr = vtophys((vm_offset_t)echomsg + offset);
+	*paddr = vtophys(echomsg);
 	return(0);
 }
 
