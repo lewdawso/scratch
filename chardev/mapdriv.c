@@ -5,6 +5,7 @@
 #include <sys/types.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <string.h>
 
 int main() {
 
@@ -24,8 +25,18 @@ int main() {
 		close(fd);
 		exit(1);
 	}
+	ptr = mmap(0, st.st_size, PROT_READ | PROT_WRITE, MAP_PRIVATE, fd, 0);
 
-	ptr = mmap(NULL, st.st_size, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+	if (ptr == MAP_FAILED) {
+		perror("mmap failed");
+		close(fd);
+		exit(1);
+	}
 
 	printf("pointer returned is %p\n", ptr);
+	printf("file descriptor is %d\n", fd);
+	//strcpy(ptr, "some string to overwrite the previous string and prove mmap works!");
+	close(fd);
+	return (0);
+
 }
