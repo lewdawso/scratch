@@ -24,7 +24,7 @@ int main() {
 	}	
 
 	if (pid ==0) {
-	//child process
+	//in the child process
 		close(pipefd[1]);
 		while(read(pipefd[0], &buf, 1) > 0) {
 			//write from buffer to stdout
@@ -36,7 +36,7 @@ int main() {
 	}
 	
 	else if (pid > 0) {
-	//parent process
+	//in the parent process
 	close(pipefd[0]);
 	write(pipefd[1], "test", 4);
 	close(pipefd[1]);

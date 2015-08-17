@@ -13,7 +13,7 @@ int main() {
 	pid_t pid;
 	char buf[256];
 
-	//make the fifo; a named communications channel
+	//make the fifo; a named communications channel / pipe
 	if (mkfifo("myfifo", 0666) < 0) {
 		perror("mkfifo");
 		exit(1);
@@ -29,7 +29,7 @@ int main() {
 	if (pid ==0) {
 	//in the child process
 	//want to send message to parent
-		//open myfifo and writing
+	//open myfifo for writing
 		char str[] = "hello parent!";
 		chld_fd = open("myfifo", O_WRONLY);
 		write(chld_fd, str, sizeof(str));
