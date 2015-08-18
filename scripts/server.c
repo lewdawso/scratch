@@ -18,7 +18,7 @@ struct addrinfo hints, *info, *p;
 struct sockaddr_storage conn_addr;
 socklen_t addr_size;
 char recv_buf[BUF_SIZE];
-char *msg = "Message from the server!\n";
+char msg[BUF_SIZE] = "message from the server!\n";
 char addr[INET_ADDRSTRLEN];
 
 //cast sockaddr to sockaddr_in
@@ -91,7 +91,7 @@ int main() {
 		//print IP of who has connected to the server
 		inet_ntop(AF_INET, convert((struct sockaddr *)&conn_addr), addr, sizeof(addr));	
 		fprintf(stdout, "Received a connection from: %s\n", addr);
-		if (send(new_fd, "test message\n", 13, 0) < 0) {
+		if (send(new_fd, msg, sizeof(msg), 0) < 0) {
 			perror("send");
 		}
 		close(new_fd);

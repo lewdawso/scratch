@@ -8,19 +8,28 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-
-#define REMOTE "localhost"
-#define PORT "7778" //port client is connecting to
 #define BUF_SIZE 256
+
+char port[6];
+char remote_host[BUF_SIZE];
+
+int  login(void) {
+	printf("Enter a remote host to connect to: \n");
+	scanf("%s", remote_host);
+	printf("Enter the port you want to connect to: \n");
+	scanf("%s", port);
+	printf("attempting to connect to: %s, %s\n", remote_host, port);
+	return (0);
+}
 
 int main() {
 
 	int status, socket_d, connect_r;
 	struct addrinfo hints, *info, *p;
-	char *host = REMOTE;
 	char buf[BUF_SIZE];
-	
 
+	//let the user login
+	login();	
 	//set hints addrinfo structure to zero
 	memset(&hints, 0, sizeof(hints));
 
@@ -30,7 +39,7 @@ int main() {
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_flags = AI_PASSIVE;
 	
-	if ((status = getaddrinfo(host, PORT, &hints, &info)) < 0) {
+	if ((status = getaddrinfo(remote_host, port, &hints, &info)) < 0) {
 		perror("getaddrinfo");
 		exit(1);
 	}
@@ -61,8 +70,9 @@ int main() {
 	freeaddrinfo(info);
 
 	//read messages from the server into a buffer
-	while (recv(socket_d, buf, sizeof(buf), 0) !=0) {
-		continue;
+	if (recv(socket_d, buf, sizeof(buf), 0) < 0) {
+		perror("recv");
+		exit(1);
 	}
 
 	//write the contents of the buffer to stout
