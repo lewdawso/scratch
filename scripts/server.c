@@ -92,8 +92,14 @@ int main() {
 		inet_ntop(AF_INET, convert((struct sockaddr *)&conn_addr), addr, sizeof(addr));	
 		fprintf(stdout, "Received a connection from: %s\n", addr);
 		if (send(new_fd, msg, sizeof(msg), 0) < 0) {
-			perror("send");
+			perror("server: send");
+			exit(1);
 		}
+		if (recv(new_fd, recv_buf, BUF_SIZE, 0) < 0) {
+			perror("server: recv");
+			exit(1);
+		}
+		printf("message received from the client: %s", recv_buf);
 		close(new_fd);
 	}
 	close(socket_fd);

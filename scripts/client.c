@@ -27,6 +27,7 @@ int main() {
 	int status, socket_d, connect_r;
 	struct addrinfo hints, *info, *p;
 	char buf[BUF_SIZE];
+	char msg[BUF_SIZE] = "what up!\n";
 
 	//let the user login
 	login();	
@@ -71,12 +72,18 @@ int main() {
 
 	//read messages from the server into a buffer
 	if (recv(socket_d, buf, sizeof(buf), 0) < 0) {
-		perror("recv");
+		perror("client: recv");
 		exit(1);
 	}
 
 	//write the contents of the buffer to stout
 	printf("Received: %s", buf);
+
+	//send a message to the server
+	if (send(socket_d, msg, sizeof(msg), 0) < 0) {
+		perror("client: send");
+		exit(1);
+	}
 	
 	//close the socket
 	close(socket_d);
