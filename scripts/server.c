@@ -23,24 +23,39 @@ void * convert(struct sockaddr * sa) {
 	return (&(tmp->sin_addr));
 }
 
+//print out IP address of new connection
 void print_connection(struct sockaddr_storage conn_addr, char *addr) {
 	inet_ntop(AF_INET, convert((struct sockaddr *)&conn_addr), addr, sizeof(addr));	
 	fprintf(stdout, "received a connection from: %s\n", addr);
 }
 
+//create new socket when we have a connection
 int new(int socket_fd, struct sockaddr_storage conn_addr, socklen_t addr_size) {
 	int des;
-	des = accept(socket_fd, (struct sockaddr *)&conn_addr, &addr_size);
+	des = accept(socket_fd, (struct sockaddr *)(&conn_addr), &addr_size);
 	return des;
 }
 
-/*void sig_handler(int signal) {
+//signal handler
+void sig_handler(int signal) {
   if (signal == SIGINT) {
   printf("SIGINT signal received - exiting now\n");
-  close(socket_fd);
   exit(1);
   }
-  }*/
+ }
+
+//function to make sure we send everything that's in our buffer
+int sendall(int s, char *buf, int len) {
+	int char_sent = 0;	
+	int char_left = len;
+
+	while (char_left) {
+	char_sent = send(s, buf + char_sent, char_left, 0);
+	char_left -= char_sent;
+	}
+	return (char_left = 0 ? 0:-1);
+	
+}
 
 int main() {
 
@@ -53,11 +68,12 @@ int main() {
 	char addr[INET_ADDRSTRLEN];
 
 	//variables required for selec() i.e. monitoring of sets of multiple file descriptors
-	struct fd_set *readfds, *core;
-	FD_ZERO(core);
-	FD_ZERO(readfds);
+	struct fd_set readfds, core;
+	FD_ZERO(&core);
+	FD_ZERO(&readfds);
+	
 	//set up the signal handler
-	//signal(SIGINT, sig_handler);
+	signal(SIGINT, sig_handler);
 
 	//create a socket and bind to it
 	memset(&hints, 0, sizeof(hints));
@@ -96,55 +112,51 @@ int main() {
 	}
 
 	//add listener socker to core
-	FD_SET(socket_fd, core);
+	FD_SET(socket_fd, &core);
 
 	//max_fd is the listener socket at this point
 	max_fd = socket_fd;
 
-	printf("Server: waiting for connections\n");
+	printf("*** WAITING FOR CONNECTIONS ***\n");
 
 	//main loop
 	for(;;) {
 		//check for an error in select
-		printf("start over\n");
 		//readfds is modified by select() to show only those that are "ready" for an operation
 		//so replace is each time with the core list of fd's to reset the states
 		readfds = core;
-		if(select(max_fd + 1, readfds, NULL, NULL, NULL) == -1) {
+		if(select(max_fd + 1, &readfds, NULL, NULL, NULL) == -1) {
 			perror("select");
 			exit(1);
 		}
-		printf("end of select\n");
 		//need to check if there are any updates to our file descriptors
 		for(i=0; i<=max_fd; i++) {
-			if(FD_ISSET(i, readfds)) {
+			if(FD_ISSET(i, &readfds)) {
 				if(i == socket_fd) {
-					printf("listener\n");
 					//new connection
 					new_fd = new(socket_fd, conn_addr, addr_size);
 					if(new_fd < 0) {
 						perror("accept");
 					} else {
 						//add new_fd to set
-						FD_SET(new_fd, core);
+						FD_SET(new_fd, &core);
 						//increment max fd's
 						if(new_fd > max_fd) {
 							max_fd = new_fd;
 						}
 						print_connection(conn_addr, addr);
-						send(new_fd, msg, sizeof(msg), 0);								}
+						sendall(new_fd, msg, sizeof(msg));								}
 
 				} else {
 					//received data from a client that's already connected
-					printf("client\n");
 					if((bytes = recv(i, recv_buf, sizeof(recv_buf), 0)) <= 0) {
 						if(bytes == 0) {
-							printf("socket %d hung up", i);
+							printf("socket %d hung up\n", i);
 						} else {
 							perror("server: recv");
 						}
 						close(i);
-						FD_CLR(i, core);
+						FD_CLR(i, &core);
 					} else {	
 						//print data to stdout
 						printf("message received from the client: %s", recv_buf);
