@@ -171,11 +171,14 @@ static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, 
 		return (-1);
 	}*/
 	//get physical address from kernal virtual address
-	*paddr = vtophys(&(echomsg->msg) + offset);
+	//*paddr = vtophys(&(echomsg->msg) + offset);
+	*paddr = vtophys(echomsg);
 	return(0);
 }
 
 static int echo_mmap_single(struct cdev *cdev, vm_ooffset_t *offset, vm_size_t size, struct vm_object **object, int nprot){
+	
+	uprintf("mmap single\n");
 	if (size > 256){
 		// BAD len
 		return ENODEV;
