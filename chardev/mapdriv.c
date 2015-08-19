@@ -37,7 +37,7 @@ int main() {
 	}
 
 	printf("pointer returned is %p\n", ptr);
-	strcpy(ptr, "some string to overwrite the previous string and prove mmap works!");
+	strcpy(ptr, "t");
 	close(fd);
 	return (0);
 
