@@ -17,3 +17,8 @@ echo -n $STR > /dev/echo
 
 #Now cat to read from the buffer
 cat /dev/echo
+
+cc -o mapdriv.o mapdriv.c
+./mapdriv.o
+
+cat /dev/echo
