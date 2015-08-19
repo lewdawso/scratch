@@ -172,7 +172,7 @@ static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, 
 	}*/
 	//get physical address from kernal virtual address
 	//*paddr = vtophys(&(echomsg->msg) + offset);
-	*paddr = vtophys(echomsg);
+	*paddr = vtophys(&(echomsg->msg));
 	return(0);
 }
 
