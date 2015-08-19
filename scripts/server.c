@@ -14,6 +14,8 @@
 #define BACKLOG 20 //how many concurrent connections we allow
 #define BUF_SIZE 256 //read or write buffer size
 
+
+
 //cast sockaddr to sockaddr_in
 
 void * convert(struct sockaddr * sa) {
@@ -24,15 +26,15 @@ void * convert(struct sockaddr * sa) {
 }
 
 //print out IP address of new connection
-void print_connection(struct sockaddr_storage conn_addr, char *addr) {
-	inet_ntop(AF_INET, convert((struct sockaddr *)&conn_addr), addr, sizeof(addr));	
-	fprintf(stdout, "received a connection from: %s\n", addr);
+void print_connection(struct sockaddr_storage *conn_addr, char *addr) {
+	inet_ntop(AF_INET, convert((struct sockaddr *)conn_addr), addr, INET_ADDRSTRLEN);	
+	fprintf(stdout, "***NEW CONNECTION FROM: %s***\n", addr);
 }
 
 //create new socket when we have a connection
-int new(int socket_fd, struct sockaddr_storage conn_addr, socklen_t addr_size) {
+int new(int socket_fd, struct sockaddr_storage *conn_addr, socklen_t *addr_size) {
 	int des;
-	des = accept(socket_fd, (struct sockaddr *)(&conn_addr), &addr_size);
+	des = accept(socket_fd, (struct sockaddr *)(conn_addr), addr_size);
 	return des;
 }
 
@@ -61,7 +63,7 @@ int main() {
 
 	int socket_fd, new_fd, max_fd, bytes, i;
 	struct addrinfo hints, *info, *p;
-	struct sockaddr_storage conn_addr;
+	struct sockaddr_storage connection;
 	socklen_t addr_size;
 	char recv_buf[BUF_SIZE];
 	char msg[BUF_SIZE] = "message from the server!\n";
@@ -122,8 +124,9 @@ int main() {
 	//main loop
 	for(;;) {
 		//check for an error in select
-		//readfds is modified by select() to show only those that are "ready" for an operation
-		//so replace is each time with the core list of fd's to reset the states
+		//readfds is modified by select() to show only those sockets 
+		//that are "ready" for a read (or write) operation
+		//so replace readfds each time with the core list of fd's to reset the states
 		readfds = core;
 		if(select(max_fd + 1, &readfds, NULL, NULL, NULL) == -1) {
 			perror("select");
@@ -134,7 +137,7 @@ int main() {
 			if(FD_ISSET(i, &readfds)) {
 				if(i == socket_fd) {
 					//new connection
-					new_fd = new(socket_fd, conn_addr, addr_size);
+					new_fd = new(socket_fd, &connection, &addr_size);
 					if(new_fd < 0) {
 						perror("accept");
 					} else {
@@ -144,7 +147,7 @@ int main() {
 						if(new_fd > max_fd) {
 							max_fd = new_fd;
 						}
-						print_connection(conn_addr, addr);
+						print_connection(&connection, addr);
 						sendall(new_fd, msg, sizeof(msg));								}
 
 				} else {
@@ -159,7 +162,7 @@ int main() {
 						FD_CLR(i, &core);
 					} else {	
 						//print data to stdout
-						printf("message received from the client: %s", recv_buf);
+						printf("\n\n***MESSAGE RECEIVED FROM CLIENT***\n\n%s\n\n", recv_buf);
 
 					}
 				}
