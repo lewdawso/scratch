@@ -30,7 +30,10 @@ int main() {
 
 	ptr = mmap(0, 256, PROT_WRITE | PROT_READ, MAP_SHARED, fd, 0);
 
-  	close(fd);
+  	if (close(fd) == -1) {
+		perror("close");
+		exit(1);
+	}
 	if (ptr == MAP_FAILED) {
 		perror("mmap failed");
 		close(fd);
