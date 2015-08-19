@@ -26,7 +26,7 @@ static d_close_t echo_close;
 static d_read_t echo_read;
 static d_write_t echo_write;
 static d_mmap_t echo_mmap;
-
+static d_mmap_single_t echo_mmap_single;
 /* Character device entry points */
 
 static struct cdevsw echo_cdevsw = {
@@ -36,13 +36,13 @@ static struct cdevsw echo_cdevsw = {
 	.d_read = echo_read,
 	.d_write = echo_write,
 	.d_mmap = echo_mmap,
+	.d_mmap_single = echo_mmap_single,
 	.d_name = "echo"
 };
 
 struct echo_softc {
 	char msg[BUFFERSIZE + 1];
-	int len;
-	pmap_t pmap;	
+	int len;	
 };
 
 static struct cdev *echo_dev;
@@ -50,7 +50,7 @@ static struct echo_softc *echomsg;
 
 MALLOC_DECLARE(M_ECHOBUF);
 MALLOC_DEFINE(M_ECHOBUF, "echobuffer", "buffer for echo module");
-
+#define ARRAY_LEN(X) (sizeof(X)/sizeof(X[0]))
 /* Load/unload function */
 
 static int echo_loader(struct module *m__unused, int what, void *arg__unused) {
@@ -63,6 +63,7 @@ static int echo_loader(struct module *m__unused, int what, void *arg__unused) {
 				break;
 			}
 			echomsg = malloc(sizeof(*echomsg), M_ECHOBUF, M_WAITOK | M_ZERO);
+			snprintf(echomsg->msg, ARRAY_LEN(echomsg->msg), "Test Test\n");
 			uprintf("Echo device loaded.\n");
 			break;
 		case MOD_UNLOAD:
@@ -170,10 +171,19 @@ static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, 
 		return (-1);
 	}*/
 	//get physical address from kernal virtual address
-	*paddr = vtophys(&(echomsg->msg));
+	*paddr = vtophys(&(echomsg->msg) + offset);
 	return(0);
 }
 
+static int echo_mmap_single(struct cdev *cdev, vm_ooffset_t *offset, vm_size_t size, struct vm_object **object, int nprot){
+	if (size > 256){
+		// BAD len
+		return ENODEV;
+	} else {
+		return ENODEV;
+	}
+
+}
 static int echo_ioctl(struct cdev *cdev, u_long cmd, caddr_t data, int32_t flag __unused, struct thread *rd __unused) {
 	uprintf("echo_ioctl");
 	return (0);

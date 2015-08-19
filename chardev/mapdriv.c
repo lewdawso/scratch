@@ -28,7 +28,7 @@ int main() {
 	
 	printf("file descriptor is %d\n", fd);	
 
-	ptr = mmap(0, 4096, PROT_WRITE | PROT_READ, MAP_SHARED, fd, 0);
+	ptr = mmap(0, 32, PROT_WRITE | PROT_READ, MAP_SHARED, fd, 0);
 
 	if (ptr == MAP_FAILED) {
 		perror("mmap failed");
@@ -37,7 +37,9 @@ int main() {
 	}
 
 	printf("pointer returned is %p\n", ptr);
-	strcpy(ptr, "t");
+	printf("hello %s", ptr);
+	sleep(10);
+	strncpy(ptr, "t", 32);
 	close(fd);
 	return (0);
 
