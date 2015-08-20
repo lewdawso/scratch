@@ -38,6 +38,17 @@ void unmap_gpio(void) {
 	munmap(p->map);
 }
 
+//set a GPIO pin as input
+void set_input(int pin) {
+	unsigned int addr;
+	unsigned int bit;
+	addr = p->p_addr + (pin/10); //each registers lets you set 10 pins
+	//input requires appropriate bits to be set as 000, so bitshift 111 to correct bit position
+	//and then take inverse 
+	bit = ~(7 << (10 % pin)*3);
+	*addr &= bit; //keep old registers values the same
+}
+
 	
 
 
