@@ -5,6 +5,8 @@
 #define PAGE_SIZE 4096
 #define PERI_BASE_ADDR 0x20000000
 #define GPIO_BASE_ADDR (PERI_BASE_ADDR + 0x20000)
+#define GPIO_SET_OUT_0 *(GPIO_BASE_ADDR + 7)
+#define GPIO_SET_OUT_1 *(GPIO_BASE_ADDR + 8)
 
 struct peripheral {
 	int map_fd; //file descriptor when opening /dev/mem
