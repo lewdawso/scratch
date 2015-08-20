@@ -62,6 +62,7 @@ static int echo_loader(struct module *m__unused, int what, void *arg__unused) {
 			if (error != 0) {
 				break;
 			}
+			uprintf("size of memory assigned is: %ld", sizeof(*echomsg));
 			echomsg = malloc(sizeof(*echomsg), M_ECHOBUF, M_WAITOK | M_ZERO);
 			snprintf(echomsg->msg, ARRAY_LEN(echomsg->msg), "Test Test\n");
 			uprintf("Echo device loaded.\n");
@@ -163,16 +164,15 @@ static int echo_mmap(struct cdev *cdev, vm_ooffset_t offset, vm_paddr_t *paddr, 
 
 	uprintf("mmap'ing device\n");
 
-	/*if (offset > round_page(sizeof(*echomsg))) {
+	if (offset > round_page(sizeof(*echomsg))) {
 		return (-1);
 	}
-	*paddr = pmap_extract(echomsg->pmap, (vm_offset_t)(echomsg + offset));
-	if (*paddr == 0) {
-		return (-1);
-	}*/
-	//get physical address from kernal virtual address
-	//*paddr = vtophys(&(echomsg->msg) + offset);
-	*paddr = vtophys(&(echomsg->msg));
+
+	//set the physical address
+	*paddr = vtophys((echomsg + offset));
+	
+	//if it's going to be mapped, set the length of the message buffer to zero
+	echomsg->len = 0;
 	return(0);
 }
 

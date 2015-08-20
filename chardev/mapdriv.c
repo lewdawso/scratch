@@ -43,8 +43,8 @@ int main() {
 	printf("pointer returned is %p\n", ptr);
 	//printf("hello %c", *(char *)ptr);
 	sleep(2);
-	strncpy(ptr, "t", 10);
-	//munmap(ptr, 32);
+	strncpy(ptr, "a", 2);
+	munmap(ptr, 10);
 	return (0);
 
 }
