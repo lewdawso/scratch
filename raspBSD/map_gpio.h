@@ -7,24 +7,25 @@
 #include <sys/mman.h>
 
 #define PAGE_SIZE 4096
-#define PERI_BASE_ADDR (volatile int *)0x20000000
+#define PERI_BASE_ADDR 0x20000000
 #define GPIO_BASE_ADDR (PERI_BASE_ADDR + 0x20000)
-#define GPIO_SET_OUT_0 *(GPIO_BASE_ADDR + 7)
-#define GPIO_SET_OUT_1 *(GPIO_BASE_ADDR + 8)
-#define GPIO_CLEAR_OUT_0 *(GPIO_BASE_ADDR + 10)
+#define GPIO_SET_OUT_0 *(volatile int *)(GPIO_BASE_ADDR + 7)
+#define GPIO_SET_OUT_1 *(volatile int *)(GPIO_BASE_ADDR + 8)
+#define GPIO_CLEAR_OUT_0 *(volatile int *)(GPIO_BASE_ADDR + 10)
 
 
 struct peripheral {
 	int map_fd; //file descriptor when opening /dev/mem
 	void *map; //pointer to map returned by mmap
-	unsigned long p_addr; //physical address we want to map = offset in the /dev/mem mmap
+	int p_addr; //physical address we want to map = offset in the /dev/mem mmap
 	volatile unsigned int *cast_map; //cast map as pointer to volatile unsigned int
 };
 
 void map_gpio(struct peripheral *p) {
 
 	//open /dev/mem
-	if (p->map_fd = open("/dev/mem", O_RDWR) < 0) {
+	p->map_fd = open("/dev/mem", O_RDWR);
+	if (p->map_fd  == -1) {
 		perror("open");
 		exit(1);
 	}
@@ -38,7 +39,7 @@ void map_gpio(struct peripheral *p) {
 	//close file descriptor
 	close(p->map_fd);
 
-	p->cast_map = (volatile unsigned int *)p->map;
+	p->cast_map = (volatile int *)p->map;
 }
 
 void unmap_gpio(struct peripheral *p) {
@@ -48,7 +49,7 @@ void unmap_gpio(struct peripheral *p) {
 //set a GPIO pin as input
 void set_as_input(struct peripheral *p, int pin) {
 	unsigned int bit;
-	volatile unsigned int *addr;
+	volatile int *addr;
 	addr = p->cast_map + (pin/10); //each function select register allows you to set 10 pins
 	//input requires appropriate bits to be set as 000, so bitshift 111 to correct bit position and then take inverse 
 	bit = ~(7 << (pin % 10)*3);
@@ -57,8 +58,8 @@ void set_as_input(struct peripheral *p, int pin) {
 
 //set a GPIO pin as output
 void set_as_output(struct peripheral *p, int pin) {
-	unsigned int bit;
-	volatile unsigned int *addr;
+	int bit;
+	volatile int *addr;
 	addr = p->cast_map + (pin/10);
 	//output required appropriate bits to be set as 001, so bit shift decimal 1 to correct bit position
 	bit = 1 << (pin % 10)*3;
