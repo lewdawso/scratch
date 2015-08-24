@@ -28,7 +28,7 @@ int main() {
 	
 	printf("file descriptor is %d\n", fd);	
 
-	ptr = mmap(0, 10, PROT_WRITE | PROT_READ, MAP_SHARED, fd, 0);
+	ptr = mmap(0, 10, PROT_WRITE | PROT_READ | PROT_EXEC, MAP_SHARED, fd, 0);
 
   	if (close(fd) == -1) {
 		perror("close");
