@@ -7,10 +7,12 @@
 #include <sys/mman.h>
 
 #define PAGE_SIZE 4096
-#define PERI_BASE_ADDR 0x20000000
+#define PERI_BASE_ADDR (volatile int *)0x20000000
 #define GPIO_BASE_ADDR (PERI_BASE_ADDR + 0x20000)
 #define GPIO_SET_OUT_0 *(GPIO_BASE_ADDR + 7)
 #define GPIO_SET_OUT_1 *(GPIO_BASE_ADDR + 8)
+#define GPIO_CLEAR_OUT_0 *(GPIO_BASE_ADDR + 10)
+
 
 struct peripheral {
 	int map_fd; //file descriptor when opening /dev/mem
@@ -44,7 +46,7 @@ void unmap_gpio(struct peripheral *p) {
 }
 
 //set a GPIO pin as input
-void set_input(struct peripheral *p, int pin) {
+void set_as_input(struct peripheral *p, int pin) {
 	unsigned int bit;
 	volatile unsigned int *addr;
 	addr = p->cast_map + (pin/10); //each function select register allows you to set 10 pins
@@ -53,11 +55,26 @@ void set_input(struct peripheral *p, int pin) {
 	*addr &= bit; //keep old registers values the same
 }
 
-void set_output(struct peripheral *p, int pin) {
+//set a GPIO pin as output
+void set_as_output(struct peripheral *p, int pin) {
 	unsigned int bit;
 	volatile unsigned int *addr;
 	addr = p->cast_map + (pin/10);
 	//output required appropriate bits to be set as 001, so bit shift decimal 1 to correct bit position
 	bit = 1 << (pin % 10)*3;
 	*addr |= bit; 
+}
+
+//set the value of a GPIO pin
+void set_output(int pin, int value) {
+	if (value == 0) {
+		GPIO_SET_OUT_0 = 1 << pin;
+	}
+	else if (value == 1) {
+		GPIO_SET_OUT_1 = 1 << pin;
+	}
+}
+
+void clear_output(int pin) {
+	GPIO_CLEAR_OUT_0 = 1 << pin;
 }
