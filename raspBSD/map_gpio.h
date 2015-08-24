@@ -29,14 +29,14 @@ void map_gpio(struct peripheral *p) {
 		exit(1);
 	}
 
-	//close file descriptor
-	close(p->map_fd);
 	//create a mapping to gpio's physical address p_addr
 	p->map = mmap(0, PAGE_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED,  p->map_fd, p->p_addr); 
 	if (p->map == MAP_FAILED) {
 		perror("mmap");
 		exit(1);
 	}
+	//close file descriptor
+	close(p->map_fd);
 
 	p->cast_map = (volatile unsigned int *)p->map;
 }
