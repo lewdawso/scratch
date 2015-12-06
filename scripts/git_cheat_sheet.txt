@@ -1,0 +1,27 @@
+#delete a local branch
+
+git branch -d <branch>
+
+#force delete a local branch
+
+git branch -D <branch>
+
+#delete a remote branch
+
+git push origin :<remote_branch> / git push origin --delete <remote_branch>
+
+#create a tag
+
+git tag -a <tag> -m <tag message>
+
+#push a tag to the remote
+
+git push origin <tag>
+
+#check what remotes are configured 
+
+git remote -v
+
+#add a remote
+
+git remote set-url origin <remote>
