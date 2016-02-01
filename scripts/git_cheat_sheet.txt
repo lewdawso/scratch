@@ -33,4 +33,4 @@ git revert <commit> ; git push origin master
 git revert $(git log | head -n 1 | cut -d " " -f 2)
 
 #amend most recent commit
-git commit -amend
+git commit --amend
