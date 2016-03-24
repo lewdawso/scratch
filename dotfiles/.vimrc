@@ -13,3 +13,6 @@ set expandtab       " Expand TABs to spaces
 set number
 set ttyfast
 set textwidth=80
+
+set splitbelow
+set splitright 
