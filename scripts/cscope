@@ -1,0 +1,6 @@
+#!/bin/sh
+
+#run in root of source code folder
+
+cscope -k -R -s "$(pwd)" -s /usr/src	
+mv cscope.out ~/
