@@ -1,6 +1,8 @@
 #!/bin/sh
 
-#run in root of source code folder
+# Builds the cscope database (cscope.out).
 
-cscope -k -R -s "$(pwd)" -s /usr/src	
+# Run in root of source code folder.
+
+cscope -k -R -s "$(pwd)"
 mv cscope.out ~/
