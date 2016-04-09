@@ -16,3 +16,8 @@ set textwidth=80
 
 set splitbelow
 set splitright 
+
+set hlsearch
+
+" add cscope.out
+cs add $CSCOPE_DB
