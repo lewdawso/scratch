@@ -202,3 +202,8 @@ esac
 }
  
 PROMPT_COMMAND=prompt_command
+export CSCOPE_DB=~/cscope.out
+
+seek () {
+    grep -ir "$1" .
+}
