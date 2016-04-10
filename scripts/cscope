@@ -1,8 +1,12 @@
 #!/bin/sh
 
-# Builds the cscope database (cscope.out).
+# Builds the cscope database (cscope.out)
 
-# Run in root of source code folder.
+# Run in root of the source code folder
 
-cscope -k -R -s "$(pwd)"
+# Generate list of source code files
+find "$(pwd)" -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" > cscope.files
+
+# Build database
+cscope -q -R -b -i cscope.files
 mv cscope.out ~/
