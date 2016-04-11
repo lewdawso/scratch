@@ -9,4 +9,4 @@ find "$(pwd)" -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" > csc
 
 # Build database
 cscope -q -R -b -i cscope.files
-mv cscope.out ~/
+mv cscope.out cscope.in.out cscope.po.out ~/
