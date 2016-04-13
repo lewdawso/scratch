@@ -8,5 +8,10 @@
 find "$(pwd)" -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.hpp" > cscope.files
 
 # Build database
+
+# -q enables fast symbol lookup
+# -R recursive directory search for source files
+# -b build the cross reference only
+# -i specifies a file of source files
 cscope -q -R -b -i cscope.files
 mv cscope.out cscope.in.out cscope.po.out ~/
