@@ -112,7 +112,7 @@ if ! shopt -oq posix; then
   fi
 fi
 
-PATH="$PATH:/usr/local/go/bin"
+PATH="$PATH:/usr/local/go/bin:~/sipcmd"
 GOPATH="$HOME/golang"
 
 ############################################
@@ -206,4 +206,25 @@ export CSCOPE_DB=~/cscope.out
 
 seek () {
     grep -ir "$1" .
+}
+
+seeks () {
+    grep -r "$1" .
+}
+
+mk () {
+    mkdir "$1" $$ cd "$1"
+}
+
+get () {
+    find . -name "*$1*"
+}
+
+# Build cScope using script in ~/scratch/scripts/cscope
+bscope () {
+    ~/scratch/scripts/cscope
+}
+
+store () {
+    mv "$1" /r510/crit/users/lewis
 }
