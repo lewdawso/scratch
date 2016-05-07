@@ -1,0 +1,7 @@
+#!/bin/bash -xe
+
+if [ -a client ]; then
+    rm client
+fi
+
+gcc -o client client.c
