@@ -26,8 +26,8 @@ int main (int argc, char *argv[]) {
         return 1;
     }
     
-    if ((connect(sockfd, res, sizeof(res))) == -1) {
-        perror("connect");
+    if ((connect(sockfd, res->ai_addr, res->ai_addrlen)) == -1) {
+        perror("connect hmm");
         return 1;
     }
 
