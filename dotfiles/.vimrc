@@ -14,10 +14,5 @@ set number
 set ttyfast
 set textwidth=80
 
-set splitbelow
-set splitright 
-
-set hlsearch
-
-" add cscope.out
-cs add $CSCOPE_DB
+"pathogen runtime path manipulation
+execute pathogen#infect()
