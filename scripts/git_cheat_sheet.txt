@@ -34,3 +34,6 @@ git revert $(git log | head -n 1 | cut -d " " -f 2)
 
 #amend most recent commit
 git commit --amend
+
+#checkout all unstaged changes
+git checkout -- .
